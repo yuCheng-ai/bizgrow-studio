@@ -1,0 +1,6 @@
+{
+  "name": "Aura Low-Code Environment",
+  "description": "Enterprise low-code business system frontend with React and TypeScript.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
