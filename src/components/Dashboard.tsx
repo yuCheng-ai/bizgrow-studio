@@ -1,135 +1,105 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Activity, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { Activity, Database, GitMerge, Bot, Zap, Clock, Network, AlertTriangle, Box, Workflow, Layers } from 'lucide-react';
 
-const BAR_DATA = [
-  { name: '周一', completed: 400, failed: 24 },
-  { name: '周二', completed: 300, failed: 13 },
-  { name: '周三', completed: 550, failed: 8 },
-  { name: '周四', completed: 278, failed: 39 },
-  { name: '周五', completed: 189, failed: 48 },
-  { name: '周六', completed: 239, failed: 38 },
-  { name: '周日', completed: 349, failed: 43 },
+const KPIS = [
+  { label: '本体概念数量', value: '10', icon: Database, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
+  { label: '业务对象数量', value: '7', icon: Box, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+  { label: '对象关系数量', value: '10', icon: GitMerge, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+  { label: '状态阶段定义', value: '7', icon: Layers, color: 'text-teal-400', bg: 'bg-teal-400/10' },
+  { label: '流程节点数量', value: '9', icon: Workflow, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+  { label: '断言规则数量', value: '5', icon: Zap, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+  { label: '注册 Agent 数', value: '5', icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+  { label: '系统自动化率', value: '92.4%', icon: Activity, color: 'text-green-400', bg: 'bg-green-400/10' },
 ];
 
-const PIE_DATA = [
-  { name: '销售部', value: 400, color: '#06b6d4' },
-  { name: '人力资源', value: 300, color: '#8b5cf6' },
-  { name: '客户支持', value: 300, color: '#10b981' },
-  { name: 'IT研发', value: 200, color: '#f59e0b' },
+const EXEC_STATS = [
+  { label: '待人工确认任务数', value: '4', icon: Clock, textClass: 'text-orange-400' },
+  { label: '异常处理任务数', value: '1', icon: AlertTriangle, textClass: 'text-red-400' },
+];
+
+const BIZ_LINK = [
+  { step: '客户需求', status: '已收集' },
+  { step: '创建订单', status: '已落库' },
+  { step: '订单评审', status: 'Agent执行中', alert: true },
+  { step: '库存检查', status: '等待前置条件' },
+  { step: '采购建议', status: '未激活' },
+  { step: '生产任务', status: '未启动' },
+  { step: '发货提醒', status: '休眠状态' },
+  { step: '完成订单', status: '终态不可达' },
 ];
 
 export function Dashboard() {
   return (
-    <div className="flex flex-col h-full bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-y-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full space-y-6 overflow-y-auto pr-2">
+      <div className="flex justify-between items-end border-b border-white/10 pb-4 shrink-0">
         <div>
-          <h2 className="text-xl font-semibold text-white">系统概览</h2>
-          <p className="text-sm text-slate-400 mt-1">实时业务指标与流程健康度监控</p>
+          <h2 className="text-2xl font-bold text-white tracking-tight">业务大盘监控</h2>
+          <p className="text-slate-400 text-sm mt-1">当前场景：<span className="text-blue-400 font-medium">订单驱动型业务闭环</span></p>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: '活跃流程', value: '1,248', desc: '较昨日增长12%', icon: Activity, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { label: '成功率', value: '98.2%', desc: '较昨日上升0.5%', icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
-          { label: '待办任务', value: '342', desc: '需要人工干预', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-          { label: '系统异常', value: '18', desc: '自动任务执行失败', icon: AlertTriangle, color: 'text-red-400', bg: 'bg-red-400/10' },
-        ].map((kpi, i) => (
-          <div key={i} className="bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition-colors">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{kpi.label}</p>
-                <h3 className="text-2xl font-bold text-white mt-2">{kpi.value}</h3>
-              </div>
-              <div className={`p-2 rounded-lg ${kpi.bg}`}>
-                <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-              </div>
+      <div className="grid grid-cols-4 gap-4 shrink-0">
+        {KPIS.map((kpi, i) => (
+          <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+            <div className={`p-3 rounded-xl ${kpi.bg}`}>
+              <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
             </div>
-            <p className="text-slate-500 text-xs mt-3">{kpi.desc}</p>
+            <div>
+              <h3 className="text-xl font-bold text-white mb-0.5">{kpi.value}</h3>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Main Chart */}
-        <div className="col-span-2 bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-2xl">
-          <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-wider">本周任务执行情况</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={BAR_DATA} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#fff" strokeOpacity={0.1} vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.8)', borderColor: 'rgba(255,255,255,0.1)', color: '#f1f5f9', backdropFilter: 'blur(8px)' }}
-                  itemStyle={{ fontSize: 12 }}
-                />
-                <Bar dataKey="completed" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={30} />
-                <Bar dataKey="failed" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
+      <div className="grid grid-cols-3 gap-6 flex-1 min-h-0">
+        <div className="col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col">
+          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+             <Network className="h-32 w-32" />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-6 shrink-0">订单业务流转链路实时探针</h3>
+          
+          <div className="flex-1 relative pr-4">
+             <div className="absolute left-[15px] top-4 border-l-2 border-dashed border-slate-700 h-[calc(100%-2rem)] z-0"></div>
+             
+             <div className="space-y-6 relative z-10">
+                {BIZ_LINK.map((node, i) => (
+                  <div key={i} className="flex items-center gap-6">
+                     <div className={`w-8 h-8 rounded-full border-4 border-slate-950 flex items-center justify-center ${['已收集', '已落库'].includes(node.status) ? 'bg-green-500 text-white' : node.alert ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-800'}`}>
+                        {['已收集', '已落库'].includes(node.status) && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
+                        {node.alert && <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping"></div>}
+                     </div>
+                     <div className="bg-black/40 border border-white/5 px-4 py-3 rounded-xl flex-1 flex justify-between items-center group hover:border-white/20 transition-all cursor-default">
+                        <span className="font-bold text-slate-200">{node.step}</span>
+                        <span className={`text-xs font-mono px-2 py-1 rounded bg-black/50 ${['已收集', '已落库'].includes(node.status) ? 'text-green-400' : node.alert ? 'text-amber-400' : 'text-slate-500'}`}>{node.status}</span>
+                     </div>
+                  </div>
+                ))}
+             </div>
           </div>
         </div>
 
-        {/* Pie Chart */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-2xl">
-          <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">各部门资源消耗</h3>
-          <div className="h-64 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={PIE_DATA}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {PIE_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.8)', borderColor: 'rgba(255,255,255,0.1)', color: '#f1f5f9', backdropFilter: 'blur(8px)' }}
-                  itemStyle={{ fontSize: 12 }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-3 mt-4">
-              {PIE_DATA.map(d => (
-                <div key={d.name} className="flex items-center gap-1.5 text-xs text-slate-400">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }}></div>
-                  {d.name}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col">
+          <h3 className="text-lg font-bold text-white mb-6 shrink-0">实时待办墙</h3>
+          <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+            {EXEC_STATS.map((stat, i) => (
+              <div key={i} className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
+                <div className="flex items-center gap-3 text-slate-300">
+                  <stat.icon className={`h-5 w-5 ${stat.textClass}`} />
+                  <span className="text-sm font-medium">{stat.label}</span>
                 </div>
-              ))}
+                <span className={`text-2xl font-bold font-mono ${stat.textClass}`}>{stat.value}</span>
+              </div>
+            ))}
+            
+            <div className="mt-8 border-t border-white/10 pt-4">
+              <span className="text-xs text-slate-500 font-bold uppercase block mb-3">系统日志动态摘要</span>
+              <div className="space-y-3 font-mono text-[10px] text-slate-400">
+                <p><span className="text-blue-400">[10:02]</span> 订单 OR-2026-001 已分配评审Agent</p>
+                <p><span className="text-blue-400">[09:58]</span> 库存水位线巡检完成 (正常)</p>
+                <p><span className="text-amber-400">[09:45]</span> 物料管理系统接口延迟 230ms</p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      
-      {/* Exception List */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-white/10 bg-white/5">
-           <h3 className="text-sm font-bold text-white uppercase tracking-wider">近期异常告警</h3>
-        </div>
-        <div className="divide-y divide-white/5">
-          {[1,2,3].map((i) => (
-            <div key={i} className="p-4 flex items-start gap-4 hover:bg-white/5 transition-colors">
-              <div className="p-2 rounded-full bg-red-500/10 text-red-400 mt-1">
-                 <AlertTriangle className="h-4 w-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <p className="text-sm font-medium text-slate-200">API 连接超时</p>
-                  <span className="text-xs text-slate-500 font-mono">10 分钟前</span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1">流程："供应商入驻" 在 "校验税号" 节点执行失败。</p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>

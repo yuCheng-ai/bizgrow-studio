@@ -1,183 +1,114 @@
-import { useState, useCallback } from 'react';
-import {
-  ReactFlow,
-  Controls,
-  Background,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-  Node,
-  Edge,
-  NodeChange,
-  EdgeChange,
-  Connection,
-  Panel
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import { Play, Settings2, User, Bot, Cpu } from 'lucide-react';
+import { GitMerge, Bot, User, Cpu, ShieldAlert } from 'lucide-react';
+import { mockProcessNodes } from '../data/mockData';
+import { TypeBadge } from './StatusBadge';
 
-const initialNodes: Node[] = [
-  {
-    id: 'start',
-    type: 'input',
-    data: { label: '开始请求' },
-    position: { x: 250, y: 50 },
-    className: '!bg-slate-800 !text-slate-200 !border-white/20 shadow-xl shadow-blue-900/20',
-  },
-  {
-    id: 'agent_1',
-    data: { 
-      label: (
-        <div className="flex justify-center items-center gap-2">
-          <Bot className="h-4 w-4 text-blue-400" />
-          <span>数据提取</span>
-        </div>
-      ) 
-    },
-    position: { x: 250, y: 150 },
-    className: '!bg-blue-600 !text-white !border-blue-400 shadow-lg',
-  },
-  {
-    id: 'human_1',
-    data: { 
-      label: (
-        <div className="flex justify-center items-center gap-2">
-          <User className="h-4 w-4 text-purple-400" />
-          <span>经理审批</span>
-        </div>
-      ) 
-    },
-    position: { x: 250, y: 250 },
-    className: '!bg-white/10 !text-white !border-white/20 backdrop-blur',
-  },
-  {
-    id: 'system_1',
-    type: 'output',
-    data: { 
-      label: (
-        <div className="flex justify-center items-center gap-2">
-          <Cpu className="h-4 w-4 text-green-400" />
-          <span>更新数据库</span>
-        </div>
-      ) 
-    },
-    position: { x: 250, y: 350 },
-    className: '!bg-slate-800 !text-slate-200 !border-white/20',
-  },
-];
-
-const initialEdges: Edge[] = [
-  { id: 'e1-2', source: 'start', target: 'agent_1', animated: true, style: { stroke: '#3b82f6' } },
-  { id: 'e2-3', source: 'agent_1', target: 'human_1' },
-  { id: 'e3-4', source: 'human_1', target: 'system_1' },
-];
-
-export function ProcessDesigner() {
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-
-  const onNodesChange = useCallback(
-    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    []
-  );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    []
-  );
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    []
-  );
-
-  const selectedNode = nodes.find(n => n.id === selectedNodeId);
-
-  return (
-    <div className="flex h-full gap-6">
-      {/* Canvas */}
-      <div className="flex-1 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 relative overflow-hidden flex flex-col">
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          <div className="bg-black/40 backdrop-blur border border-white/10 p-2 rounded-lg text-sm flex gap-4 text-slate-300">
-            <span className="flex items-center gap-1.5"><Bot className="h-4 w-4 text-blue-400"/> 智能体节点</span>
-            <span className="flex items-center gap-1.5"><User className="h-4 w-4 text-purple-400"/> 人工任务</span>
-            <span className="flex items-center gap-1.5"><Cpu className="h-4 w-4 text-green-400"/> 系统动作</span>
-          </div>
+export function ProcessDesigner({ setRightPanel }: { setRightPanel: (content: any) => void }) {
+  
+  const handleSelect = (node: any) => {
+    setRightPanel(
+      <div className="p-6 space-y-6">
+        <div>
+          <h3 className="text-xl font-bold text-white mb-1">{node.name}</h3>
+          <p className="text-sm text-slate-400">ID: {node.id}</p>
         </div>
         
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onSelectionChange={(params) => {
-            if (params.nodes.length > 0) {
-              setSelectedNodeId(params.nodes[0].id);
-            } else {
-              setSelectedNodeId(null);
-            }
-          }}
-          className="bg-transparent"
-          fitView
-        >
-          <Background color="#ffffff" style={{opacity: 0.1}} gap={20} size={1} />
-          <Controls className="fill-slate-300" />
-        </ReactFlow>
-      </div>
-
-      {/* Properties Panel */}
-      <div className="w-80 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 overflow-y-auto flex flex-col">
-        <div className="p-4 border-b border-white/10 bg-white/5 sticky top-0 font-medium text-white flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Settings2 className="h-4 w-4 text-blue-400" /> 
-            节点属性配置
+        <div className="space-y-4">
+          <div>
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">节点类型</h4>
+            <TypeBadge type={node.type} />
           </div>
-          {selectedNodeId && (
-             <span className="text-xs bg-white/10 px-2 py-1 rounded text-slate-300 font-mono">{selectedNodeId}</span>
-          )}
-        </div>
-        
-        <div className="p-4 flex flex-col gap-4">
-          {selectedNode ? (
-            <>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium uppercase tracking-wider">节点类型</label>
-                <div className="text-sm bg-white/5 border border-white/10 px-3 py-2 rounded-md capitalize text-white">
-                  {selectedNode.type || 'default'}
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-medium uppercase tracking-wider">节点名称</label>
-                <input 
-                  type="text" 
-                  defaultValue={typeof selectedNode.data.label === 'string' ? selectedNode.data.label : '自定义节点'}
-                  className="w-full text-sm bg-white/5 border border-white/10 px-3 py-2 rounded-md focus:border-blue-500 outline-none text-white"
-                />
-              </div>
+          
+          <div className="bg-black/20 border border-white/5 p-4 rounded-xl space-y-3">
+             <div className="flex justify-between border-b border-white/5 pb-2">
+               <span className="text-slate-500 text-xs font-mono">执行主体</span>
+               <span className="text-slate-200 text-sm font-bold">{node.executor}</span>
+             </div>
+             
+             <div className="flex justify-between border-b border-white/5 pb-2">
+               <span className="text-slate-500 text-xs font-mono">输入对象</span>
+               <span className="text-slate-300 text-sm">{node.input}</span>
+             </div>
+             
+             <div className="flex justify-between pb-2">
+               <span className="text-slate-500 text-xs font-mono">输出预期</span>
+               <span className="text-blue-400 text-sm">{node.output}</span>
+             </div>
+          </div>
 
-              {selectedNode.id.includes('agent') && (
-                 <div className="space-y-1">
-                 <label className="text-xs text-slate-400 font-medium uppercase tracking-wider">业务大模型选择</label>
-                 <select className="w-full text-sm bg-white/5 border border-white/10 px-3 py-2 rounded-md focus:border-blue-500 outline-none text-white [&>option]:bg-slate-900">
-                   <option>Gemini 1.5 Pro</option>
-                   <option>Gemini 1.5 Flash</option>
-                 </select>
-               </div>
-              )}
-              
-              <div className="pt-4 mt-2 border-t border-white/10">
-                <button className="w-full flex items-center justify-center gap-2 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-md transition-colors text-sm font-medium">
-                  <Play className="h-4 w-4" /> 执行测试
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center text-slate-500 text-sm mt-10">
-              在画布中选定节点即可配置参数
+          <div>
+             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">流转条件</h4>
+             <div className="bg-white/5 border border-white/10 px-3 py-2 rounded text-sm text-slate-300 font-mono">
+               {node.condition}
+             </div>
+          </div>
+          
+          <div>
+             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">失败补偿动作</h4>
+             <div className="bg-red-500/10 border border-red-500/20 px-3 py-2 rounded text-sm text-red-400">
+               {node.failureAction}
+             </div>
+          </div>
+
+          {node.needManualConfirm && (
+            <div className="mt-4 flex items-center gap-2 text-amber-400 bg-amber-500/10 border border-amber-500/20 p-3 rounded-lg text-sm font-medium">
+               <ShieldAlert className="h-4 w-4" /> 本节点执行动作需要人工二次确认
             </div>
           )}
         </div>
+      </div>
+    );
+  };
+
+  const getIcon = (type: string) => {
+    switch(type) {
+      case 'agent': return <Bot className="h-5 w-5 text-purple-400" />;
+      case 'human': return <User className="h-5 w-5 text-orange-400" />;
+      case 'system': return <Cpu className="h-5 w-5 text-cyan-400" />;
+      case 'condition': return <GitMerge className="h-5 w-5 text-amber-400" />;
+      default: return <div className="h-5 w-5" />;
+    }
+  };
+
+  const getStyle = (type: string) => {
+    switch(type) {
+      case 'agent': return 'border-purple-500/50 bg-purple-900/20 hover:bg-purple-900/30';
+      case 'human': return 'border-orange-500/50 bg-orange-900/20 hover:bg-orange-900/30';
+      case 'system': return 'border-cyan-500/50 bg-cyan-900/20 hover:bg-cyan-900/30';
+      case 'condition': return 'border-amber-500/50 bg-amber-900/20 hover:bg-amber-900/30 rotate-45 scale-75 rounded-lg';
+      default: return 'border-white/20 bg-white/5';
+    }
+  };
+
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <GitMerge className="h-6 w-6 text-blue-400" />
+          混合执行流编排
+        </h2>
+        <p className="text-slate-400 text-sm mt-1">编排业务流转。节点可为人工、系统服务或 AI Agent。</p>
+      </div>
+
+      <div className="flex-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl relative overflow-hidden flex flex-col items-center justify-start p-8 overflow-y-auto">
+         {/* Simplified vertical flowchart representation */}
+         {mockProcessNodes.map((node, i) => (
+           <div key={node.id} className="flex flex-col items-center cursor-pointer" onClick={() => handleSelect(node)}>
+             
+             <div className={`p-4 border shadow-xl flex items-center justify-center gap-3 transition-colors text-center w-64 ${getStyle(node.type)} ${node.type !== 'condition' ? 'rounded-xl' : ''}`}>
+               <div className={node.type === 'condition' ? '-rotate-45 flex items-center gap-2' : 'flex items-center justify-center gap-3 w-full'}>
+                 {getIcon(node.type)}
+                 <span className={`font-bold text-slate-200 ${node.type === 'condition' ? 'text-xs' : 'text-sm'}`}>{node.name}</span>
+               </div>
+             </div>
+             
+             {i !== mockProcessNodes.length - 1 && (
+                <div className="h-10 w-0.5 bg-slate-700 relative my-2">
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-700"></div>
+                </div>
+             )}
+           </div>
+         ))}
       </div>
     </div>
   );
