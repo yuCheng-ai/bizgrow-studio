@@ -51,52 +51,74 @@ export function Dashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-6 flex-1 min-h-0">
-        <div className="col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col">
-          <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-             <Network className="h-32 w-32" />
-          </div>
-          <h3 className="text-lg font-bold text-white mb-6 shrink-0">订单业务流转链路实时探针</h3>
-          
-          <div className="flex-1 relative pr-4">
-             <div className="absolute left-[15px] top-4 border-l-2 border-dashed border-slate-700 h-[calc(100%-2rem)] z-0"></div>
-             
-             <div className="space-y-6 relative z-10">
-                {BIZ_LINK.map((node, i) => (
-                  <div key={i} className="flex items-center gap-6">
-                     <div className={`w-8 h-8 rounded-full border-4 border-slate-950 flex items-center justify-center ${['已收集', '已落库'].includes(node.status) ? 'bg-green-500 text-white' : node.alert ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-800'}`}>
-                        {['已收集', '已落库'].includes(node.status) && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
-                        {node.alert && <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping"></div>}
-                     </div>
-                     <div className="bg-black/40 border border-white/5 px-4 py-3 rounded-xl flex-1 flex justify-between items-center group hover:border-white/20 transition-all cursor-default">
-                        <span className="font-bold text-slate-200">{node.step}</span>
-                        <span className={`text-xs font-mono px-2 py-1 rounded bg-black/50 ${['已收集', '已落库'].includes(node.status) ? 'text-green-400' : node.alert ? 'text-amber-400' : 'text-slate-500'}`}>{node.status}</span>
-                     </div>
+      <div className="flex flex-col gap-6 flex-1 min-h-0">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 shrink-0 relative overflow-hidden">
+          <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-blue-500/10 to-transparent pointer-events-none"></div>
+          <h3 className="text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest shrink-0">系统生成构建链路 (底层驱动)</h3>
+          <p className="text-xs text-slate-500 mb-6">低代码平台通过以下构件链式组装，最终生成并驱动右上层业务应用的自主运行：</p>
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {['业务本体', '业务对象', '关系图谱', '状态机', '流程编排', '规则引擎', 'AI Agent'].map((step, idx, arr) => (
+              <div key={idx} className="flex items-center shrink-0">
+                <div className="bg-slate-900 border border-slate-700 px-4 py-2 rounded-lg text-sm font-bold text-slate-300 shadow-inner">
+                  {step}
+                </div>
+                {idx !== arr.length - 1 && (
+                  <div className="w-8 h-[2px] bg-slate-700 relative mx-1">
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0 h-0 border-y-[4px] border-y-transparent border-l-[6px] border-l-slate-700"></div>
                   </div>
-                ))}
-             </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col">
-          <h3 className="text-lg font-bold text-white mb-6 shrink-0">实时待办墙</h3>
-          <div className="space-y-4 flex-1 overflow-y-auto pr-2">
-            {EXEC_STATS.map((stat, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                <div className="flex items-center gap-3 text-slate-300">
-                  <stat.icon className={`h-5 w-5 ${stat.textClass}`} />
-                  <span className="text-sm font-medium">{stat.label}</span>
-                </div>
-                <span className={`text-2xl font-bold font-mono ${stat.textClass}`}>{stat.value}</span>
-              </div>
-            ))}
+        <div className="grid grid-cols-3 gap-6 flex-1 min-h-0">
+          <div className="col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6 relative overflow-hidden flex flex-col">
+            <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+               <Network className="h-32 w-32" />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-6 shrink-0">订单业务运行链路 (当前实例)</h3>
             
-            <div className="mt-8 border-t border-white/10 pt-4">
-              <span className="text-xs text-slate-500 font-bold uppercase block mb-3">系统日志动态摘要</span>
-              <div className="space-y-3 font-mono text-[10px] text-slate-400">
-                <p><span className="text-blue-400">[10:02]</span> 订单 OR-2026-001 已分配评审Agent</p>
-                <p><span className="text-blue-400">[09:58]</span> 库存水位线巡检完成 (正常)</p>
-                <p><span className="text-amber-400">[09:45]</span> 物料管理系统接口延迟 230ms</p>
+            <div className="flex-1 relative pr-4">
+               <div className="absolute left-[15px] top-4 border-l-2 border-dashed border-slate-700 h-[calc(100%-2rem)] z-0"></div>
+               
+               <div className="space-y-6 relative z-10">
+                  {BIZ_LINK.map((node, i) => (
+                    <div key={i} className="flex items-center gap-6">
+                       <div className={`w-8 h-8 rounded-full border-4 border-slate-950 flex items-center justify-center ${['已收集', '已落库'].includes(node.status) ? 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.3)]' : node.alert ? 'bg-amber-500 text-white animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-slate-800'}`}>
+                          {['已收集', '已落库'].includes(node.status) && <div className="w-2 h-2 bg-slate-900 rounded-full"></div>}
+                          {node.alert && <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping"></div>}
+                       </div>
+                       <div className={`bg-black/40 border px-4 py-3 rounded-xl flex-1 flex justify-between items-center transition-all cursor-default ${node.alert ? 'border-amber-500/30 bg-amber-950/20' : 'border-white/5 hover:border-white/20'}`}>
+                          <span className={`${node.alert ? 'font-bold text-amber-200' : 'font-bold text-slate-200'}`}>{node.step}</span>
+                          <span className={`text-xs font-mono px-2 py-1 rounded bg-black/50 ${['已收集', '已落库'].includes(node.status) ? 'text-green-400' : node.alert ? 'text-amber-400 font-bold' : 'text-slate-500'}`}>{node.status}</span>
+                       </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          </div>
+
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col">
+            <h3 className="text-lg font-bold text-white mb-6 shrink-0">实时待办墙</h3>
+            <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+              {EXEC_STATS.map((stat, i) => (
+                <div key={i} className={`flex items-center justify-between p-4 bg-black/20 rounded-xl border ${stat.textClass === 'text-orange-400' ? 'border-orange-500/20 bg-orange-950/10' : 'border-red-500/20 bg-red-950/10'}`}>
+                  <div className="flex items-center gap-3 text-slate-300">
+                    <stat.icon className={`h-5 w-5 ${stat.textClass}`} />
+                    <span className="text-sm font-medium">{stat.label}</span>
+                  </div>
+                  <span className={`text-2xl font-bold font-mono ${stat.textClass}`}>{stat.value}</span>
+                </div>
+              ))}
+              
+              <div className="mt-8 border-t border-white/10 pt-4">
+                <span className="text-xs text-slate-500 font-bold uppercase block mb-3">运行摘要</span>
+                <div className="space-y-3 font-mono text-[10px] text-slate-400">
+                  <p><span className="text-blue-400">[10:02]</span> 订单 OR-2026-001 已分配评审Agent</p>
+                  <p><span className="text-blue-400">[09:58]</span> 库存水位线巡检完成 (正常)</p>
+                  <p><span className="text-amber-400">[09:45]</span> 供应商打分接口延迟 230ms</p>
+                </div>
               </div>
             </div>
           </div>

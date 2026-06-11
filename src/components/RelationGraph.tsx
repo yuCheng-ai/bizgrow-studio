@@ -2,9 +2,53 @@ import { useState } from 'react';
 import { Network, Link2 } from 'lucide-react';
 import { mockRelations } from '../data/mockData';
 
+const GRAPH_NODES = [
+  { id: '客户', x: 50, y: 15 },
+  { id: '订单', x: 50, y: 35 },
+  { id: '订单明细', x: 75, y: 35 },
+  { id: '产品', x: 75, y: 50 },
+  { id: 'BOM', x: 75, y: 65 },
+  { id: '物料', x: 75, y: 80 },
+  { id: '库存', x: 50, y: 80 },
+  { id: '采购需求', x: 25, y: 80 },
+  { id: '生产任务', x: 25, y: 65 },
+  { id: '发货单', x: 25, y: 50 },
+  { id: '应收款', x: 25, y: 35 },
+];
+
 export function RelationGraph() {
   const [selectedRelId, setSelectedRelId] = useState(mockRelations[0].id);
   const selectedRel = mockRelations.find(r => r.id === selectedRelId);
+
+  // Helper to draw lines
+  const drawLine = (sourceId: string, targetId: string) => {
+    const s = GRAPH_NODES.find(n => n.id === sourceId);
+    const t = GRAPH_NODES.find(n => n.id === targetId);
+    if (!s || !t) return null;
+    
+    const isSelected = selectedRel?.source === sourceId && selectedRel?.target === targetId;
+
+    return (
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+        <defs>
+          <marker id={`arrow-${isSelected}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill={isSelected ? '#06b6d4' : '#475569'} />
+          </marker>
+        </defs>
+        <line
+          x1={`${s.x}%`}
+          y1={`${s.y}%`}
+          x2={`${t.x}%`}
+          y2={`${t.y}%`}
+          stroke={isSelected ? '#06b6d4' : '#475569'}
+          strokeWidth={isSelected ? 3 : 1.5}
+          markerEnd={`url(#arrow-${isSelected})`}
+          className="transition-all duration-300"
+          strokeDasharray={isSelected ? '0' : '4 2'}
+        />
+      </svg>
+    );
+  };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -17,38 +61,58 @@ export function RelationGraph() {
       </div>
 
       <div className="flex-1 flex gap-6 min-h-0">
-        {/* Left: Graphical Chain */}
-        <div className="flex-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-y-auto p-8 relative flex flex-col items-center">
-           <div className="max-w-md w-full relative z-10 flex flex-col items-center pb-20">
-             {mockRelations.map((rel, i) => (
-               <div 
-                  key={rel.id} 
-                  className="w-full flex flex-col items-center cursor-pointer group"
-                  onClick={() => setSelectedRelId(rel.id)}
-               >
-                 {/* Object Node */}
-                 {i === 0 && (
-                   <div className="bg-slate-900 border border-slate-700 px-6 py-3 rounded-xl shadow-lg z-10 min-w-[200px] text-center mb-1 relative">
-                     <span className="font-bold text-slate-200">{rel.source}</span>
-                   </div>
-                 )}
-                 
-                 {/* Edge connecting them */}
-                 <div className={`h-16 w-0.5 relative transition-colors ${selectedRelId === rel.id ? 'bg-cyan-500' : 'bg-slate-700 group-hover:bg-slate-500'}`}>
-                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] px-3 py-1 rounded-full border whitespace-nowrap z-20 font-bold transition-all ${selectedRelId === rel.id ? 'bg-cyan-900 text-cyan-300 border-cyan-500 scale-110 shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'bg-slate-800 text-slate-400 border-slate-600 group-hover:bg-slate-700 group-hover:text-slate-300'}`}>
-                      {rel.type}
-                    </div>
-                    {/* Arrow head */}
-                    <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent transition-colors ${selectedRelId === rel.id ? 'border-t-cyan-500' : 'border-t-slate-700 group-hover:border-t-slate-500'}`}></div>
-                 </div>
-
-                 {/* Next Object Node target */}
-                 <div className={`mt-1 border px-6 py-3 rounded-xl shadow-lg z-10 min-w-[200px] text-center transition-all ${selectedRelId === rel.id ? 'bg-cyan-950/30 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.2)]' : 'bg-white/5 border-white/10 group-hover:border-white/30'}`}>
-                   <span className={`font-bold transition-colors ${selectedRelId === rel.id ? 'text-cyan-400' : 'text-slate-300 group-hover:text-white'}`}>{rel.target}</span>
-                 </div>
-               </div>
+        {/* Left: Graphical Map Canvas */}
+        <div className="flex-1 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 relative flex items-center justify-center overflow-hidden">
+           
+           <div className="relative w-full max-w-2xl h-[500px]">
+             
+             {/* Lines rendered as SVGs */}
+             {mockRelations.map(rel => (
+               <div key={`line-${rel.id}`}>{drawLine(rel.source, rel.target)}</div>
              ))}
+
+             {/* Nodes rendered as absolute divs */}
+             {GRAPH_NODES.map(node => {
+               const isSourceOfSelected = selectedRel?.source === node.id;
+               const isTargetOfSelected = selectedRel?.target === node.id;
+               const isActive = isSourceOfSelected || isTargetOfSelected;
+
+               return (
+                 <div 
+                   key={node.id} 
+                   className={`absolute -translate-x-1/2 -translate-y-1/2 px-4 py-2.5 rounded-xl border text-sm font-bold shadow-lg transition-all z-10 
+                     ${isActive ? 'bg-cyan-900/40 border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)] text-white' : 'bg-slate-900 border-slate-700 text-slate-300'}
+                     ${node.id === '订单' ? 'scale-110 !font-black ring-2 ring-indigo-500/50' : ''}
+                   `}
+                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
+                 >
+                   {node.id}
+                 </div>
+               );
+             })}
+
+             {/* Functional hidden clickable hotspots for relationships */}
+             {mockRelations.map(rel => {
+                const s = GRAPH_NODES.find(n => n.id === rel.source);
+                const t = GRAPH_NODES.find(n => n.id === rel.target);
+                if (!s || !t) return null;
+                const midX = (s.x + t.x) / 2;
+                const midY = (s.y + t.y) / 2;
+                const isSelected = selectedRel?.id === rel.id;
+                return (
+                  <div 
+                    key={`hit-${rel.id}`}
+                    onClick={() => setSelectedRelId(rel.id)}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer px-2 py-0.5 rounded text-[10px] font-mono z-20 
+                       transition-all shadow hover:scale-110 ${isSelected ? 'bg-cyan-500 text-slate-950 font-bold border border-cyan-400' : 'bg-slate-800 text-slate-400 border border-slate-600 hover:bg-slate-700 hover:text-slate-200'}`}
+                    style={{ left: `${midX}%`, top: `${midY}%` }}
+                  >
+                    {rel.type}
+                  </div>
+                )
+             })}
            </div>
+
         </div>
 
         {/* Right: Detail Panel */}
@@ -81,7 +145,7 @@ export function RelationGraph() {
                
                <div className="mt-6">
                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Agent 可利用此关系</h4>
-                 <ul className="space-y-2 text-xs text-slate-400">
+                 <ul className="space-y-2 text-xs text-slate-400 leading-relaxed">
                    <li className="flex gap-2"><span>•</span> 通过 [{selectedRel.target}] 逆向追溯并锁定受影响的 [{selectedRel.source}]</li>
                    <li className="flex gap-2"><span>•</span> 预判 [{selectedRel.source}] 状态变动后产生的全域多米诺骨牌效应</li>
                  </ul>
