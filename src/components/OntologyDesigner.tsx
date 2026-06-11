@@ -115,14 +115,15 @@ export function OntologyDesigner({ setRightPanel }: { setRightPanel: (content: a
                 </div>
 
                 <div className="bg-slate-900 border border-indigo-500/20 p-5 rounded-xl shadow-inner">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-2">
                     <h4 className="text-sm font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-                      <Link2 className="h-4 w-4"/> 知识外挂 / SOP加载
+                      <Link2 className="h-4 w-4"/> 关联资料与接口
                     </h4>
                     <button className="text-xs font-medium text-slate-300 hover:text-white bg-indigo-600/20 hover:bg-indigo-600/40 px-3 py-1 rounded transition-colors whitespace-nowrap border border-indigo-500/30">
                       + 挂载资产
                     </button>
                   </div>
+                  <p className="text-[10px] text-slate-500 mb-4">这些资料不是本体本身，而是 Agent 执行业务时可参考的外部依据。</p>
                   <div className="space-y-3">
                     <div className="bg-black/40 p-3 rounded-lg border border-white/5 flex items-center justify-between group hover:border-white/20 transition-colors cursor-pointer">
                       <div className="flex flex-col">

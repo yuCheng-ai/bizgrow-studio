@@ -29,7 +29,7 @@ export function AgentConfig() {
             <div className="mb-6 shrink-0">
               <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
                 <Bot className="h-6 w-6 text-purple-400" />
-                {agent.name} 运行策略空间
+                {agent.name} 职责与权限配置
               </h2>
               <p className="text-slate-400 text-sm mt-1">{agent.description}</p>
             </div>
@@ -40,42 +40,42 @@ export function AgentConfig() {
                  <div className="space-y-4">
                    
                    <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
-                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><Eye className="h-4 w-4"/> 读取权限沙箱</h4>
+                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><Eye className="h-4 w-4"/> 可读取的数据</h4>
                      <div className="flex flex-wrap gap-2">
                        {agent.readAccess.map(r => <span key={r} className="bg-slate-800 border border-slate-700 text-slate-300 text-xs px-2 py-1 rounded">{r}</span>)}
                      </div>
                    </div>
 
                    <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
-                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><Target className="h-4 w-4"/> 负责数据对象</h4>
+                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><Target className="h-4 w-4"/> 负责业务对象</h4>
                      <div className="flex flex-wrap gap-2">
                        {agent.targetObjects.map(r => <span key={r} className="bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-xs px-2 py-1 rounded">{r}</span>)}
                      </div>
                    </div>
 
                    <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
-                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><TerminalSquare className="h-4 w-4"/> 可执行动作边界</h4>
+                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><TerminalSquare className="h-4 w-4"/> 允许执行的动作</h4>
                      <div className="flex flex-col gap-2">
                        {agent.allowedActions.map(r => <span key={r} className="text-green-400 text-sm flex items-center gap-2 border-b border-white/5 pb-1 last:border-0">• {r}</span>)}
                      </div>
                    </div>
 
                    <div className="bg-red-500/5 border border-red-500/20 p-5 rounded-2xl shadow-inner">
-                     <h4 className="text-xs font-bold text-red-500 mb-3 flex items-center gap-2"><Ban className="h-4 w-4"/> 强限制禁止指令</h4>
+                     <h4 className="text-xs font-bold text-red-500 mb-3 flex items-center gap-2"><Ban className="h-4 w-4"/> 禁止执行的动作</h4>
                      <div className="flex flex-col gap-2 text-sm text-red-300 font-medium">
                        {agent.forbiddenActions.map(r => <span key={r} className="flex items-center gap-2 border-b border-red-500/10 pb-1 last:border-0">⛔️ {r}</span>)}
                      </div>
                    </div>
 
                    <div className="bg-amber-500/5 border border-amber-500/20 p-5 rounded-2xl shadow-inner">
-                     <h4 className="text-xs font-bold text-amber-500 mb-3 flex items-center gap-2"><AlertOctagon className="h-4 w-4"/> 触发系统阻隔与人工确认节点</h4>
+                     <h4 className="text-xs font-bold text-amber-500 mb-3 flex items-center gap-2"><AlertOctagon className="h-4 w-4"/> 需要人工确认的动作</h4>
                      <div className="flex flex-col gap-2 text-sm text-amber-200/90 font-medium">
                        {agent.manualConfirmRules.map(r => <span key={r} className="flex items-center gap-2 border-b border-amber-500/10 pb-1 last:border-0">⚠️ {r}</span>)}
                      </div>
                    </div>
 
                    <div className="bg-white/5 border border-white/10 p-5 rounded-2xl">
-                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><FileOutput className="h-4 w-4"/> 标准输出制品</h4>
+                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-3"><FileOutput className="h-4 w-4"/> 输出结果</h4>
                      <div className="flex flex-wrap gap-2">
                        {agent.outputs.map(r => <span key={r} className="bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs px-2 py-1 rounded">{r}</span>)}
                      </div>
@@ -86,7 +86,7 @@ export function AgentConfig() {
                  {/* Live Trajectory Section */}
                  <div className="bg-[#0a0a0f] border border-purple-500/30 rounded-2xl flex flex-col overflow-hidden backdrop-blur-xl shadow-2xl shadow-purple-900/10 sticky top-0" style={{maxHeight: 'calc(100vh - 12rem)'}}>
                    <div className="p-4 bg-purple-500/20 border-b border-purple-500/30 flex justify-between items-center shrink-0">
-                     <h3 className="font-bold text-purple-300 text-sm flex items-center gap-2"><Bot className="h-4 w-4"/> 代理脑回放: 推理执行轨迹</h3>
+                     <h3 className="font-bold text-purple-300 text-sm flex items-center gap-2"><Bot className="h-4 w-4"/> 执行过程回放</h3>
                      <div className="flex gap-1 items-center">
                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                        <span className="text-[10px] text-green-400 font-mono uppercase tracking-widest">Active</span>
@@ -110,7 +110,7 @@ export function AgentConfig() {
                           <span>当前 Agent 日志流暂无活动记录</span>
                         </div>
                      )}
-                     {agent.executionLog.length > 0 && <div className="text-purple-500 animate-pulse mt-4">&gt;_ Awaiting next domain stream...</div>}
+                     {agent.executionLog.length > 0 && <div className="text-purple-500 animate-pulse mt-4">&gt;_ 等待下一次业务事件...</div>}
                    </div>
                  </div>
               </div>

@@ -39,9 +39,19 @@ export function ProcessDesigner({ setRightPanel }: { setRightPanel: (content: an
           </div>
 
           <div>
-             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">流转条件规则</h4>
+             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">流转条件</h4>
              <div className="bg-white/5 border border-white/10 px-3 py-2 rounded text-sm text-slate-300 font-mono">
                {node.condition}
+             </div>
+          </div>
+
+          <div>
+             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">触发的业务规则</h4>
+             <div className="bg-indigo-500/10 border border-indigo-500/20 px-3 py-2 rounded text-sm text-indigo-300">
+               {node.id === 'p_4' ? '库存不足 → 生成采购建议' : 
+                node.id === 'p_2' ? '金额超过 100000 → 增加老板审批节点' :
+                node.type === 'agent' ? '关键字段修改 → 必须人工确认' :
+                '默认流转规则 (无特殊阻断)'}
              </div>
           </div>
           

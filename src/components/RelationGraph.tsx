@@ -58,6 +58,9 @@ export function RelationGraph() {
           全链路逻辑关系图谱 (Relation Graph)
         </h2>
         <p className="text-slate-400 text-sm mt-1">展示业务对象之间的传导链条：牵一发而动全身。</p>
+        <p className="text-cyan-400 text-sm mt-1 font-medium bg-cyan-900/20 inline-block px-3 py-1 rounded border border-cyan-800/30">
+          核心链路：以订单为中心，串联客户、产品、物料、库存、采购、生产、发货、应收。
+        </p>
       </div>
 
       <div className="flex-1 flex gap-6 min-h-0">
