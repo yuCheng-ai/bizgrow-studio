@@ -47,9 +47,9 @@ export function TaskCenter({ setRightPanel }: { setRightPanel: (content: any) =>
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <CheckSquare className="h-6 w-6 text-orange-400" />
-            干预调度中心 (Task Center)
+            任务中心
           </h2>
-          <p className="text-slate-400 text-sm mt-1">处理人工介入、Agent挂起、以及规则流转的待办任务。</p>
+          <p className="text-slate-400 text-sm mt-1">承接流程、规则和 Agent 生成的待办任务，处理人工确认、异常和转办。</p>
         </div>
       </div>
 

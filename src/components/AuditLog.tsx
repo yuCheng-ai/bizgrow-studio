@@ -8,9 +8,9 @@ export function AuditLog() {
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <History className="h-6 w-6 text-slate-400" />
-            全域审计追踪 (Audit Log)
+            审计日志
           </h2>
-          <p className="text-slate-400 text-sm mt-1">记录系统内的所有流转、Agent推理演算及数据结构变更。</p>
+          <p className="text-slate-400 text-sm mt-1">记录每一次业务流转、规则命中、Agent 动作、人工确认和数据修改。</p>
         </div>
         <div className="relative w-64">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
@@ -38,39 +38,39 @@ export function AuditLog() {
                    <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                      {log.reads.length > 0 && (
                        <div>
-                         <span className="text-slate-500 block mb-1">DATA_READ: </span>
+                         <span className="text-slate-500 block mb-1">读取数据: </span>
                          <span className="text-slate-400">{log.reads.join(', ')}</span>
                        </div>
                      )}
                      
                      {log.rulesHit.length > 0 && (
                        <div>
-                         <span className="text-amber-500/80 block mb-1">RULE_HIT: </span>
+                         <span className="text-amber-500/80 block mb-1">命中规则: </span>
                          <span className="text-amber-200">{log.rulesHit.join(', ')}</span>
                        </div>
                      )}
 
                      {log.agentJudgment && (
                        <div className="col-span-2 bg-purple-900/10 border border-purple-500/20 p-2 rounded text-purple-300">
-                         <span className="text-purple-500/80 block mb-1">AGENT_THOUGHT: </span>
+                         <span className="text-purple-500/80 block mb-1">Agent判断: </span>
                          {log.agentJudgment}
                        </div>
                      )}
 
                      <div className="col-span-2 flex items-center justify-between border-t border-white/5 pt-2 mt-2">
                        <div>
-                         <span className="text-slate-500 block mb-1">EXECUTE_ACTION: </span>
+                         <span className="text-slate-500 block mb-1">执行动作: </span>
                          <span className="text-green-400 font-bold">{log.action}</span>
                        </div>
                        
                        <div className="text-right">
-                         <span className="text-slate-500 border border-slate-700 px-2 py-0.5 rounded mr-2 inline-block">Manual_Confirm: {log.manualConfirmed ? 'TRUE' : 'FALSE'}</span>
+                         <span className="text-slate-500 border border-slate-700 px-2 py-0.5 rounded mr-2 inline-block">人工确认: {log.manualConfirmed ? 'TRUE' : 'FALSE'}</span>
                          {log.result === 'success' ? (
-                           <span className="text-green-500">200 OK</span>
+                           <span className="text-green-500">成功</span>
                          ) : log.result === 'waiting' ? (
-                           <span className="text-amber-500">202 ACCEPTED_WAITING</span>
+                           <span className="text-amber-500">等待确认</span>
                          ) : (
-                           <span className="text-red-500">500 FAILED</span>
+                           <span className="text-red-500">失败</span>
                          )}
                        </div>
                      </div>

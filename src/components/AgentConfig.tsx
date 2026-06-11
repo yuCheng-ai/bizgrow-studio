@@ -95,9 +95,9 @@ export function AgentConfig() {
                    <div className="flex-1 p-4 overflow-y-auto space-y-3 font-mono text-[11px] text-slate-300">
                      {agent.executionLog.length > 0 ? agent.executionLog.map((log, i) => {
                        let colorClass = 'text-slate-300';
-                       if (log.includes('防御拦截') || log.includes('触发系统拦截')) colorClass = 'text-amber-400 font-bold';
-                       else if (log.includes('动作执行') || log.includes('断言生效')) colorClass = 'text-green-400';
-                       else if (log.includes('推理启动') || log.includes('策略回测')) colorClass = 'text-purple-300';
+                       if (log.includes('规则拦截') || log.includes('触发人工确认')) colorClass = 'text-amber-400 font-bold';
+                       else if (log.includes('动作执行') || log.includes('规则命中')) colorClass = 'text-green-400';
+                       else if (log.includes('开始分析') || log.includes('方案校验')) colorClass = 'text-purple-300';
 
                        return (
                          <div key={i} className={`pb-2 border-b border-white/5 ${colorClass}`}>

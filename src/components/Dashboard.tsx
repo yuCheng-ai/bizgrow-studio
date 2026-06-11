@@ -33,10 +33,8 @@ export function Dashboard() {
       <div className="flex justify-between items-end border-b border-white/10 pb-4 shrink-0">
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight">业务大盘监控</h2>
-          <div className="mt-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-lg text-indigo-300 text-sm font-medium">
-             BizGrow Studio 的工作方式：先定义业务世界，再生成业务系统，最后由 Agent 推动业务运行。
-          </div>
-          <p className="text-slate-400 text-sm mt-3">当前场景：<span className="text-blue-400 font-medium">订单驱动型业务闭环</span></p>
+          <p className="text-slate-400 text-sm mt-2">当前场景：<span className="text-blue-400 font-medium">订单驱动型业务闭环</span></p>
+          <p className="text-indigo-400 text-sm mt-1 font-medium bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-md inline-block">先定义业务世界，再生成业务系统，最后由 Agent 推动业务运行。</p>
         </div>
       </div>
 
