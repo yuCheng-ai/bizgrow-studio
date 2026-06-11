@@ -1,20 +1,54 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# BizGrow Studio
 
-# Run and deploy your AI Studio app
+BizGrow Studio 是一个基于「本体论驱动」的低代码 Agent 业务操作系统原型。其核心设计理念是：**先定义业务世界，再生成业务系统，最后由 Agent 推动业务运行。**
 
-This contains everything you need to run your app locally.
+该阶段原型侧重于展示系统配置与 Agent 协调运转的可视化交互流程，主要完成纯前端的展示与交互，不包含真实后端、登录鉴权体系及真实 AI API 调用。
 
-View your app in AI Studio: https://ai.studio/apps/950a3592-6cc0-4e78-a8ce-3daae08ee8ff
+## 项目定位
 
-## Run Locally
+传统的业务系统（ERP、CRM 等）往往是通过静态数据表和业务规则组合，人工进行操作推进流转。
+BizGrow Studio 颠覆性地将业务世界描述为 **本体 (Ontology)**、**对象 (Object)**、**关系 (Relation)** 与 **状态机 (State Machine)**，使底层数据结构具备更高语义：
+- **核心模块化设计**：不仅设计表结构，而是基于“本体对象”串联整个产业要素。
+- **Agent 本地化运行**：业务规则与流程交由特定的微 Agent 处理，无需人工干预即可自动化向前推演。
+- **干预调度与全局审计**：提供强大的可观测性监控视图，将人工角色转变为“控制塔台管理员”，仅在 Agent 遇到异常阻断或关键业务决策时进行“放行”与“干预”。
 
-**Prerequisites:**  Node.js
+## 核心模块说明
 
+1. **总览 (Dashboard)**: 监控业务大盘健康度和各环节关键指标。
+2. **业务本体 (Ontology)**: 定义商业模式中核心概念实体（如客户、订单、产品等）。
+3. **业务对象 (Object)**: 通过建立业务对象实例化本体并定义其实际包含的数据字段。
+4. **关系图谱 (Relation)**: 搭建各类对象之间的数据驱动关系（如订单“包含”明细，“依赖”物料）。
+5. **状态机 (State)**: 为每一个业务对象设计生命周期及其触发的上下游限制环节。
+6. **流程编排 (Process)**: 图形化拖拽工作流，分配人工审批环节或挂载各种执行 Agent 节点。
+7. **规则引擎 (Rule)**: 配置影响系统路由和打回策略的“IF-THEN”拦截规则网关。
+8. **Agent 配置 (Agent)**: 赋能具体 Agent（如“采购建议Agent”、“订单评审Agent”），定义其可访问数据和被允许执行的业务动作。
+9. **任务中心 (Task Center)**: 汇聚由工作流、系统警告或 Agent 拦截产生的人工代办任务。
+10. **审计日志 (Audit Log)**: 沉淀每一次对系统触发的增删改查及每一次 Agent 的思考推演轨迹，确保业务的可追溯性。
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 开发与运行方式
+
+本项目采用纯前端 Mock 技术栈，以 `TypeScript`, `React`, `Vite` 构建，并使用 `Tailwind CSS` 与 `lucide-react` 提供核心视觉系统。
+
+```bash
+# 1. 安装依赖
+npm install
+
+# 2. 本地开发服务器 (运行在 3000 端口)
+npm run dev
+
+# 3. 类型检查与代码校验
+npm run lint
+
+# 4. 构建生产环境产物
+npm run build
+```
+
+**运行约束：**
+- `npm run dev` 已经限定通过 `host=0.0.0.0` 和 `port=3000` 启动服务。
+
+## 目录结构
+
+- `src/components/`: 前端可视化界面及各个业务面板的核心组件（经过通用组件提取精简整理）。
+- `src/components/common/`: 基础 UI 组件，如 `PageHeader`, `Card`, `StatusBadge`。
+- `src/data/`: 将原本混合存放的底层系统数据抽离，根据所划分模块拆分，便于独立迭代。包含 `mockAgent`, `mockBusiness`, `mockExecution`, `mockOntology`, `mockProcess` 等。
+- `src/types.ts`: TypeScript 接口，定义了“本体”、“业务状态”、“规则”、“Agent”、“执行日志”等核心系统对象的数据结构。

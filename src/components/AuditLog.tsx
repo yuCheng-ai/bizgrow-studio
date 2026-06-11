@@ -1,22 +1,21 @@
 import { History, Search } from 'lucide-react';
-import { mockLog } from '../data/mockData';
+import { mockLog } from '../data';
+import { PageHeader } from './common';
 
 export function AuditLog() {
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-6 flex justify-between items-end">
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <History className="h-6 w-6 text-slate-400" />
-            审计日志
-          </h2>
-          <p className="text-slate-400 text-sm mt-1">记录每一次业务流转、规则命中、Agent 动作、人工确认和数据修改。</p>
-        </div>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
-          <input type="text" placeholder="Trace ID / 业务单号" className="w-full bg-white/5 border border-white/10 rounded-md py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-500" />
-        </div>
-      </div>
+      <PageHeader 
+        title="审计日志"
+        description="记录每一次业务流转、规则命中、Agent 动作、人工确认和数据修改。"
+        icon={History}
+        action={
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+            <input type="text" placeholder="Trace ID / 业务单号" className="w-full bg-white/5 border border-white/10 rounded-md py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-blue-500 transition-colors text-white placeholder-slate-500" />
+          </div>
+        }
+      />
 
       <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-6 overflow-y-auto relative">
          <div className="absolute top-6 bottom-6 left-12 w-[1px] bg-white/10"></div>

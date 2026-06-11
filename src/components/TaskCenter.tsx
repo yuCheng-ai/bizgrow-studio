@@ -1,9 +1,11 @@
+import { Task } from '../types';
+import React from 'react';
 import { CheckSquare } from 'lucide-react';
-import { mockTasks } from '../data/mockData';
-import { StatusBadge, TypeBadge } from './StatusBadge';
+import { mockTasks } from '../data';
+import { StatusBadge, TypeBadge, PageHeader, RightPanelItem } from './common';
 
-export function TaskCenter({ setRightPanel }: { setRightPanel: (content: any) => void }) {
-  const handleSelect = (task: any) => {
+export function TaskCenter({ setRightPanel }: { setRightPanel: (content: React.ReactNode | null) => void }) {
+  const handleSelect = (task: Task) => {
     setRightPanel(
       <div className="p-6 space-y-6">
         <div>
@@ -12,25 +14,10 @@ export function TaskCenter({ setRightPanel }: { setRightPanel: (content: any) =>
         </div>
         
         <div className="space-y-4 font-sm">
-           <div className="flex justify-between border-b border-white/10 pb-2">
-             <span className="text-slate-500">当前状态</span>
-             <StatusBadge status={task.status} />
-           </div>
-           
-           <div className="flex justify-between border-b border-white/10 pb-2">
-             <span className="text-slate-500">任务来源</span>
-             <TypeBadge type={task.source} />
-           </div>
-           
-           <div className="flex justify-between border-b border-white/10 pb-2">
-             <span className="text-slate-500">负责人</span>
-             <span className="text-white">{task.owner}</span>
-           </div>
-           
-           <div className="flex justify-between border-b border-white/10 pb-2">
-             <span className="text-slate-500">截止时间</span>
-             <span className="text-red-400 font-bold">{task.deadline}</span>
-           </div>
+           <RightPanelItem label="当前状态" value={<StatusBadge status={task.status} />} />
+           <RightPanelItem label="任务来源" value={<TypeBadge type={task.source} />} />
+           <RightPanelItem label="负责人" value={task.owner} />
+           <RightPanelItem label="截止时间" value={task.deadline} valueClass="text-red-400 font-bold" />
 
            <div className="pt-6 flex gap-3">
              <button className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg font-bold">立即处理</button>
@@ -43,15 +30,11 @@ export function TaskCenter({ setRightPanel }: { setRightPanel: (content: any) =>
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-6 flex justify-between items-end">
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <CheckSquare className="h-6 w-6 text-orange-400" />
-            任务中心
-          </h2>
-          <p className="text-slate-400 text-sm mt-1">承接流程、规则和 Agent 生成的待办任务，处理人工确认、异常和转办。</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="任务中心" 
+        description="承接流程、规则和 Agent 生成的待办任务，处理人工确认、异常和转办。" 
+        icon={CheckSquare} 
+      />
 
       <div className="flex-1 overflow-y-auto">
         <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">

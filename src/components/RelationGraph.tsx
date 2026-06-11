@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Network, Link2 } from 'lucide-react';
-import { mockRelations } from '../data/mockData';
+import { mockRelations } from '../data';
 
 const GRAPH_NODES = [
   { id: '客户', x: 50, y: 15 },

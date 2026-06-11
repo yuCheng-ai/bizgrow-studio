@@ -1,6 +1,6 @@
 import { Workflow, ArrowRight } from 'lucide-react';
-import { mockStates } from '../data/mockData';
-import { StatusBadge } from './StatusBadge';
+import { mockStates } from '../data';
+import { StatusBadge } from './common';
 
 export function StateMachineDesigner() {
   return (

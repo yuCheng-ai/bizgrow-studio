@@ -1,6 +1,6 @@
 import { FileCheck2, Filter, Zap, Box, Bot } from 'lucide-react';
-import { mockRules } from '../data/mockData';
-import { StatusBadge } from './StatusBadge';
+import { mockRules } from '../data';
+import { StatusBadge } from './common';
 
 export function RuleEnginePanel() {
   return (

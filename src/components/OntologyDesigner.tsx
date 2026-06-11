@@ -1,9 +1,10 @@
+import React from 'react';
 import { useState } from 'react';
-import { Database, Link2, Zap, LayoutGrid, ArrowRight, Info, MousePointerClick } from 'lucide-react';
-import { mockOntologies } from '../data/mockData';
+import { Database, Link2, Zap, LayoutGrid, Info, MousePointerClick } from 'lucide-react';
+import { mockOntologies } from '../data';
 import { OntologyConcept } from '../types';
 
-export function OntologyDesigner({ setRightPanel }: { setRightPanel: (content: any) => void }) {
+export function OntologyDesigner({ setRightPanel }: { setRightPanel: (content: React.ReactNode | null) => void }) {
   const [selectedId, setSelectedId] = useState<string>(mockOntologies[1].id);
   
   const selectedConcept = mockOntologies.find(c => c.id === selectedId) || mockOntologies[0];

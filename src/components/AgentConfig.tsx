@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Bot, TerminalSquare, Eye, Ban, AlertOctagon, Target, FileOutput } from 'lucide-react';
-import { mockAgents } from '../data/mockData';
+import { mockAgents } from '../data';
 
 export function AgentConfig() {
   const [selectedAgentId, setSelectedAgentId] = useState(mockAgents[2].id);

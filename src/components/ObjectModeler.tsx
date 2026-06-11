@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { mockObjects } from '../data/mockData';
-import { TypeBadge } from './StatusBadge';
+import { mockObjects } from '../data';
+import { TypeBadge } from './common';
 import { Search, Database, Layers, GitMerge, Zap, Bot, Activity } from 'lucide-react';
 
 export function ObjectModeler() {

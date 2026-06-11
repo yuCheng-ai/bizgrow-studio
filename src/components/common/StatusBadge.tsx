@@ -1,5 +1,5 @@
-import { CheckCircle2, Circle, AlertCircle, Clock, Search, MoreHorizontal } from 'lucide-react';
-import { cn } from '../lib/utils';
+import React from 'react';
+import { cn } from '../../lib/utils';
 
 export function StatusBadge({ status, className }: { status: string, className?: string }) {
   const getStyle = () => {
@@ -20,8 +20,6 @@ export function StatusBadge({ status, className }: { status: string, className?:
         return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
       case 'failed':
       case 'blocked':
-      case '异常':
-      case '已拒绝':
         return 'bg-red-500/10 text-red-400 border border-red-500/20';
       default:
         return 'bg-slate-500/10 text-slate-400 border border-slate-500/20';
@@ -35,7 +33,7 @@ export function StatusBadge({ status, className }: { status: string, className?:
   );
 }
 
-export function TypeBadge({ type }: { type: string }) {
+export function TypeBadge({ type, className }: { type: string, className?: string }) {
   const getStyle = () => {
     if(type.includes('Agent') || type.includes('agent')) return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
     if(type.includes('系统') || type.includes('system')) return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
@@ -44,7 +42,7 @@ export function TypeBadge({ type }: { type: string }) {
   };
 
   return (
-    <span className={cn("px-2 py-0.5 rounded border text-[10px] uppercase font-semibold mx-2", getStyle())}>
+    <span className={cn("px-2 py-0.5 rounded border text-[10px] uppercase font-semibold", getStyle(), className)}>
       {type}
     </span>
   );

@@ -1,8 +1,9 @@
-import { GitMerge, Bot, User, Cpu, ShieldAlert, ArrowDown } from 'lucide-react';
-import { mockProcessNodes } from '../data/mockData';
-import { TypeBadge } from './StatusBadge';
+import React from 'react';
+import { GitMerge, Bot, User, Cpu, ShieldAlert } from 'lucide-react';
+import { mockProcessNodes } from '../data';
+import { TypeBadge } from './common';
 
-export function ProcessDesigner({ setRightPanel }: { setRightPanel: (content: any) => void }) {
+export function ProcessDesigner({ setRightPanel }: { setRightPanel: (content: React.ReactNode | null) => void }) {
   
   const handleSelect = (nodeId: string) => {
     const node = mockProcessNodes.find(n => n.id === nodeId);

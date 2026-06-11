@@ -17,7 +17,7 @@ export const MODULES = [
   { id: 'audit', label: '审计日志', icon: History },
 ] as const;
 
-export function Sidebar({ activeModule, setActiveModule, setRightPanel }: any) {
+export function Sidebar({ activeModule, setActiveModule, setRightPanel }: { activeModule: string; setActiveModule: (m: string) => void; setRightPanel: (c: React.ReactNode | null) => void; }) {
   return (
     <div className="w-64 bg-slate-900 border-r border-white/10 flex flex-col z-20 shrink-0">
       <div className="h-14 flex items-center px-6 border-b border-white/10 shrink-0">
