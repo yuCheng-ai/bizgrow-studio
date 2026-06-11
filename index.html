@@ -4,10 +4,88 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="BizGrow Studio - 本体论驱动的低代码 Agent 业务操作系统前端原型" />
-    <title>BizGrow Studio</title>
+    <title>BizGrow Studio Demo</title>
+    <style>
+      :root { color-scheme: dark; --bg:#0b0f19; --panel:#111827; --panel2:#0f172a; --line:rgba(255,255,255,.1); --text:#e5e7eb; --muted:#94a3b8; --blue:#60a5fa; --green:#34d399; --amber:#f59e0b; --red:#f87171; --purple:#a78bfa; --cyan:#22d3ee; }
+      * { box-sizing: border-box; }
+      body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--bg); color:var(--text); }
+      .app { display:flex; min-height:100vh; background:radial-gradient(circle at 20% 0%, rgba(37,99,235,.16), transparent 32%), #0b0f19; }
+      aside { width:250px; background:#0f172a; border-right:1px solid var(--line); padding:18px 14px; position:sticky; top:0; height:100vh; }
+      .brand { font-size:20px; font-weight:800; color:#93c5fd; margin:0 0 20px; display:flex; gap:8px; align-items:center; }
+      .nav-title { color:#64748b; font-size:11px; font-weight:800; letter-spacing:.12em; margin:14px 10px; }
+      .nav button { width:100%; border:1px solid transparent; background:transparent; color:#94a3b8; padding:10px 12px; border-radius:10px; text-align:left; cursor:pointer; font-weight:650; margin:2px 0; }
+      .nav button.active, .nav button:hover { background:rgba(37,99,235,.18); color:#60a5fa; border-color:rgba(96,165,250,.22); }
+      main { flex:1; display:flex; flex-direction:column; min-width:0; }
+      header { height:58px; border-bottom:1px solid var(--line); background:rgba(15,23,42,.86); display:flex; align-items:center; justify-content:space-between; padding:0 26px; position:sticky; top:0; z-index:2; backdrop-filter:blur(8px); }
+      .pill { border:1px solid var(--line); background:rgba(255,255,255,.05); border-radius:999px; padding:6px 12px; color:#cbd5e1; font-size:12px; font-weight:800; }
+      .content { padding:24px; max-width:1280px; width:100%; margin:0 auto; }
+      h1 { font-size:26px; margin:0; }
+      .sub { color:var(--muted); margin:8px 0 0; line-height:1.6; }
+      .hero { border:1px solid rgba(96,165,250,.22); background:linear-gradient(135deg, rgba(37,99,235,.16), rgba(15,23,42,.72)); border-radius:20px; padding:22px; margin-bottom:20px; }
+      .grid { display:grid; gap:14px; }
+      .metrics { grid-template-columns:repeat(4,minmax(0,1fr)); margin:18px 0; }
+      .card { background:rgba(255,255,255,.045); border:1px solid var(--line); border-radius:18px; padding:18px; }
+      .metric .value { font-size:24px; font-weight:900; color:#fff; }
+      .metric .label { color:#94a3b8; font-size:12px; margin-top:5px; }
+      .chain { display:flex; align-items:center; gap:8px; overflow-x:auto; padding:6px 0; }
+      .node { flex:0 0 auto; border:1px solid #334155; background:#111827; border-radius:12px; padding:10px 14px; font-weight:800; color:#cbd5e1; font-size:13px; }
+      .arrow { color:#475569; font-weight:900; }
+      .section { margin-top:18px; }
+      .section h2 { font-size:18px; margin:0 0 12px; }
+      .two { grid-template-columns:1.35fr .65fr; }
+      .world { display:flex; align-items:center; justify-content:space-between; gap:8px; overflow-x:auto; padding:18px; border:1px solid var(--line); border-radius:18px; background:rgba(0,0,0,.22); }
+      .world .concept { min-width:86px; text-align:center; }
+      .bubble { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; margin:0 auto 8px; background:#1e293b; border:1px solid #475569; color:#93c5fd; font-weight:900; }
+      .list { display:grid; gap:10px; }
+      .item { display:flex; justify-content:space-between; gap:12px; border:1px solid var(--line); background:rgba(0,0,0,.22); border-radius:14px; padding:12px 14px; }
+      .tag { border-radius:999px; padding:4px 8px; font-size:11px; font-weight:900; white-space:nowrap; }
+      .blue{ color:var(--blue); background:rgba(96,165,250,.12); border:1px solid rgba(96,165,250,.25); } .green{ color:var(--green); background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.25); } .amber{ color:var(--amber); background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.25); } .red{ color:var(--red); background:rgba(248,113,113,.12); border:1px solid rgba(248,113,113,.25); } .purple{ color:var(--purple); background:rgba(167,139,250,.12); border:1px solid rgba(167,139,250,.25); }
+      .flow { display:flex; flex-direction:column; align-items:center; gap:10px; }
+      .flow-node { width:260px; text-align:center; border:1px solid #334155; background:#111827; border-radius:14px; padding:12px; font-weight:850; }
+      .branch { display:grid; grid-template-columns:1fr 1fr; gap:24px; width:min(620px,100%); }
+      .timeline { position:relative; padding-left:26px; }
+      .timeline:before { content:""; position:absolute; left:8px; top:6px; bottom:6px; width:1px; background:var(--line); }
+      .log { position:relative; margin:0 0 12px; padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:rgba(0,0,0,.22); }
+      .log:before { content:""; position:absolute; left:-23px; top:18px; width:9px; height:9px; border-radius:99px; background:#60a5fa; }
+      .hidden { display:none !important; }
+      .footerlog { position:fixed; bottom:0; left:250px; right:0; border-top:1px solid var(--line); background:rgba(2,6,23,.94); padding:10px 18px; color:#94a3b8; font-size:12px; }
+      @media (max-width:900px){ aside{width:88px}.brand span,.nav button span,.nav-title{display:none}.footerlog{left:88px}.metrics{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.content{padding:16px}.node{font-size:12px}.branch{grid-template-columns:1fr} }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="app">
+      <aside>
+        <div class="brand">◆ <span>BizGrow Studio</span></div>
+        <div class="nav-title">业务操作系统</div>
+        <nav class="nav" id="nav"></nav>
+      </aside>
+      <main>
+        <header><span class="pill">运行环境 · Demo</span><strong id="title">总览</strong></header>
+        <div class="content" id="view"></div>
+      </main>
+    </div>
+    <div class="footerlog">[10:02] 订单 OR-2026-001 已分配订单评审 Agent，正在等待规则校验。</div>
+    <script>
+      const modules = ["总览","业务本体","业务对象","关系图谱","状态机","流程编排","规则引擎","Agent配置","任务中心","审计日志"];
+      const metrics = [["10","本体概念数量"],["7","业务对象数量"],["10","对象关系数量"],["7","状态阶段定义"],["9","流程节点数量"],["5","业务规则数量"],["5","注册 Agent 数"],["92.4%","系统自动化率"]];
+      const world = ["客户","订单","产品","BOM","物料","库存","采购需求","生产任务","发货单","应收款"];
+      const run = ["客户需求","创建订单","订单评审","库存检查","采购建议","生产任务","发货提醒","完成订单"];
+      let active = "总览";
+      function chain(items){ return `<div class="chain">${items.map((x,i)=>`<div class="node">${x}</div>${i<items.length-1?'<span class="arrow">→</span>':''}`).join('')}</div>`; }
+      function header(title, sub){ return `<div class="hero"><h1>${title}</h1><p class="sub">${sub}</p></div>`; }
+      function dashboard(){ return `${header('业务大盘监控','当前场景：订单驱动型业务闭环。先定义业务世界，再生成业务系统，最后由 Agent 推动业务运行。')}<div class="grid metrics">${metrics.map(m=>`<div class="card metric"><div class="value">${m[0]}</div><div class="label">${m[1]}</div></div>`).join('')}</div><div class="card section"><h2>系统生成构建链路</h2>${chain(["业务本体","业务对象","关系图谱","状态机","流程编排","规则引擎","AI Agent"])}</div><div class="grid two section"><div class="card"><h2>订单业务运行链路</h2><div class="list">${run.map((x,i)=>`<div class="item"><b>${x}</b><span class="tag ${i<2?'green':i===2?'amber':'blue'}">${i<2?'已完成':i===2?'Agent执行中':'待触发'}</span></div>`).join('')}</div></div><div class="card"><h2>实时待办墙</h2><div class="item"><b>待人工确认任务数</b><span class="tag amber">4</span></div><div class="item"><b>异常处理任务数</b><span class="tag red">1</span></div></div></div>`; }
+      function ontology(){ return `${header('业务本体','不是向量知识库，而是对真实业务世界运行规律的结构化定义。')}<div class="world">${world.map(x=>`<div class="concept"><div class="bubble">${x[0]}</div><b>${x}</b></div>`).join('')}</div><div class="grid two section"><div class="card"><h2>订单</h2><p class="sub">客户需求转化后的正式业务承诺，是供应链运转的第一驱动力。</p><p><span class="tag blue">客户</span> <span class="tag blue">产品明细</span> <span class="tag blue">交付期限</span> <span class="tag blue">总金额</span> <span class="tag blue">生命周期状态</span></p></div><div class="card"><h2>关联资料与接口</h2><p class="sub">这些资料不是本体本身，而是 Agent 执行业务时可参考的外部依据。</p><div class="item"><b>业务处理 SOP 手册</b><span class="tag green">已挂载</span></div><div class="item"><b>订单操作 OpenAPI</b><span class="tag green">已挂载</span></div></div></div>`; }
+      function objects(){ return `${header('业务对象','将抽象本体概念落成可被系统控制、被 Agent 读写的业务实体。')}<div class="grid two"><div class="card"><h2>订单对象</h2><div class="list">${['订单编号 orderNo','客户 customerId','产品明细 products','承诺交期 deliveryDate','订单金额 amount','状态 status','风险等级 riskLevel'].map(x=>`<div class="item"><b>${x}</b><span class="tag blue">字段</span></div>`).join('')}</div></div><div class="card"><h2>行为边界</h2><p><span class="tag green">提交评审</span> <span class="tag green">修改交期</span> <span class="tag green">更新风险等级</span></p><p><span class="tag purple">Agent 可读订单</span> <span class="tag amber">关键字段需人工确认</span></p></div></div>`; }
+      function relation(){ return `${header('关系图谱','以订单为中心，串联客户、产品、物料、库存、采购、生产、发货、应收。')}<div class="card">${chain(['客户','订单','订单明细','产品','BOM','物料','库存','采购需求','生产任务','发货单','应收款'])}</div><div class="grid metrics section">${['拥有','包含','引用','关联','拆解','影响','触发','推动'].map(x=>`<div class="card"><b class="tag blue">${x}</b><p class="sub">关系业务语义</p></div>`).join('')}</div>`; }
+      function state(){ return `${header('状态机','控制订单从草稿到完成的生命周期，并处理取消、阻塞和人工确认。')}<div class="card">${chain(['草稿','待评审','已确认','执行中','已发货','已完成'])}</div><div class="grid metrics section"><div class="card"><b>待评审</b><p class="sub">离开校验：客户、产品、交期、金额不能为空。</p></div><div class="card"><b>已阻塞</b><p class="sub">进入条件：库存不足、供应商延期或规则拦截。</p></div></div>`; }
+      function process(){ return `${header('流程编排','混合编排人工节点、系统节点、Agent 节点和条件分支。')}<div class="card flow"><div class="flow-node">创建订单【人工】</div><span>↓</span><div class="flow-node">订单评审【Agent + 人工确认】</div><span>↓</span><div class="flow-node">库存检查【系统】</div><span>↓</span><div class="flow-node" style="border-color:#f59e0b">是否缺料？</div><div class="branch"><div class="card"><b>是：生成采购建议</b><p class="sub">等待人工确认 → 等待采购到货</p></div><div class="card"><b>否：创建生产任务</b><p class="sub">进入生产执行链路</p></div></div><span>↓</span><div class="flow-node">发货提醒 → 完成订单</div></div>`; }
+      function rules(){ return `${header('规则引擎','规则结构：WHEN 事件 / IF 条件 / THEN 动作。')}<div class="list">${[['订单已确认','库存不足','生成采购建议并通知采购 Agent'],['订单提交评审','金额超过 100000','增加老板审批节点'],['交期小于 7 天','库存不足','标记为高风险订单'],['Agent 修改关键字段','金额、交期、客户信用','必须人工确认']].map(r=>`<div class="card"><div class="chain"><span class="tag blue">WHEN ${r[0]}</span><span class="arrow">→</span><span class="tag amber">IF ${r[1]}</span><span class="arrow">→</span><span class="tag green">THEN ${r[2]}</span></div></div>`).join('')}</div>`; }
+      function agent(){ return `${header('Agent配置','定义业务 Agent 的职责、数据权限、动作边界和人工确认规则。')}<div class="grid two"><div class="card"><h2>采购建议 Agent</h2><p><span class="tag blue">采购需求</span> <span class="tag blue">物料</span> <span class="tag blue">库存</span> <span class="tag blue">供应商</span></p><h3>允许执行的动作</h3><p><span class="tag green">生成采购建议</span> <span class="tag green">推荐供应商</span> <span class="tag green">提醒采购员</span></p><h3>禁止执行的动作</h3><p><span class="tag red">直接付款</span> <span class="tag red">直接下正式采购单</span> <span class="tag red">修改银行账户</span></p></div><div class="card"><h2>执行过程回放</h2><div class="timeline">${['读取订单','检查 BOM','查询库存','发现缺料','生成采购建议','等待人工确认'].map(x=>`<div class="log">${x}</div>`).join('')}</div></div></div>`; }
+      function tasks(){ return `${header('任务中心','承接流程、规则和 Agent 生成的待办任务，处理人工确认、异常和转办。')}<div class="list">${['确认订单 OR-2026-001 的交期','审核采购建议 PR-2026-008','处理高风险订单 OR-2026-003','确认库存缺料清单','复核 Agent 推荐供应商'].map((x,i)=>`<div class="item"><b>${x}</b><span class="tag ${i<2?'amber':'blue'}">${i<2?'等待确认':'待处理'}</span></div>`).join('')}</div>`; }
+      function audit(){ return `${header('审计日志','记录每一次业务流转、规则命中、Agent 动作、人工确认和数据修改。')}<div class="timeline">${['09:10 订单 OR-2026-001 被提交评审','09:11 订单评审 Agent 读取客户信用、历史订单、交期要求','09:12 命中规则：交期小于 7 天，需要标记风险','09:15 发现物料 M-102 库存不足','09:17 采购建议 Agent 创建 PR-2026-008','09:18 等待采购员人工确认'].map(x=>`<div class="log">${x}</div>`).join('')}</div>`; }
+      const views = {"总览":dashboard,"业务本体":ontology,"业务对象":objects,"关系图谱":relation,"状态机":state,"流程编排":process,"规则引擎":rules,"Agent配置":agent,"任务中心":tasks,"审计日志":audit};
+      function render(){ document.getElementById('title').textContent=active; document.getElementById('nav').innerHTML=modules.map(m=>`<button class="${m===active?'active':''}" onclick="active='${m}';render()"><span>${m}</span></button>`).join(''); document.getElementById('view').innerHTML=views[active](); }
+      render();
+    </script>
   </body>
 </html>
