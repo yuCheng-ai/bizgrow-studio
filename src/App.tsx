@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Background, Controls, ReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { Modal } from './components/Modal';
+import { FieldForm } from './components/FieldForm';
+import { TextInput, NumberInput, SelectInput, TextAreaInput, ToggleInput } from './components/FormField';
 import {
   AlertTriangle,
   ArrowRight,
@@ -17,6 +20,7 @@ import {
   LockKeyhole,
   MessageSquareText,
   PackageCheck,
+  Pencil,
   PlayCircle,
   Plus,
   ShieldCheck,
@@ -25,6 +29,7 @@ import {
   TimerReset,
 } from 'lucide-react';
 import { Sidebar, ModuleId } from './components/Sidebar';
+import type { ObjectFieldMock } from './data/platformMock';
 import {
   businessObjects,
   lifecycleGraphEdges,
@@ -320,8 +325,18 @@ function ObjectConsoleContent() {
 }
 
 function FieldModelContent() {
+  // ---- State: fields (mutable) ----
+  const [fields, setFields] = useState<ObjectFieldMock[]>(orderFields);
+
+  // ---- State: selected field ----
   const [selectedFieldId, setSelectedFieldId] = useState('deliveryDate');
-  const selectedField = orderFields.find((field) => field.id === selectedFieldId) ?? orderFields[0];
+  const selectedField = fields.find((field) => field.id === selectedFieldId) ?? fields[0];
+
+  // ---- State: modal & editing ----
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // ---- Impact map (still static for now) ----
   const fieldImpactMap: Record<string, string[]> = {
     orderNo: ['审计日志', '订单详情页', 'Agent查询上下文'],
     customer: ['客户信用', '账期规则', '老板审批视图'],
@@ -335,14 +350,117 @@ function FieldModelContent() {
   const selectedImpacts = fieldImpactMap[selectedField.id] ?? ['对象详情', '审计日志'];
   const selectedRules = orderRules.filter((rule) => rule.fieldIds.includes(selectedField.id));
 
+  // ---- Handlers ----
+  const handleSelectField = useCallback((id: string) => {
+    setSelectedFieldId(id);
+    setIsEditing(false);
+  }, []);
+
+  const handleCreateField = useCallback((newField: ObjectFieldMock) => {
+    setFields((prev) => [...prev, newField]);
+    setIsModalOpen(false);
+    setSelectedFieldId(newField.id);
+  }, []);
+
+  const handleUpdateField = useCallback((updated: ObjectFieldMock) => {
+    setFields((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+    setIsEditing(false);
+  }, []);
+
+  // ---- Edit form state (for inline editing in detail panel) ----
+  const [editForm, setEditForm] = useState({
+    name: '',
+    code: '',
+    semantic: '',
+    risk: '低' as '低' | '中' | '高',
+    agentPermission: '',
+    views: '',
+  });
+
+  const startEditing = useCallback(() => {
+    if (!selectedField) return;
+    setEditForm({
+      name: selectedField.name,
+      code: selectedField.code,
+      semantic: selectedField.semantic,
+      risk: selectedField.risk,
+      agentPermission: selectedField.agentPermission,
+      views: selectedField.views,
+    });
+    setIsEditing(true);
+  }, [selectedField]);
+
+  const cancelEditing = useCallback(() => {
+    setIsEditing(false);
+  }, []);
+
+  const saveInlineEdit = useCallback(() => {
+    if (!selectedField || !editForm.name.trim() || !editForm.code.trim()) return;
+    const updated: ObjectFieldMock = {
+      ...selectedField,
+      name: editForm.name.trim(),
+      code: editForm.code.trim(),
+      semantic: editForm.semantic.trim(),
+      risk: editForm.risk,
+      agentPermission: editForm.agentPermission,
+      views: editForm.views || '未配置视图',
+    };
+    handleUpdateField(updated);
+  }, [selectedField, editForm, handleUpdateField]);
+
+  // ---- Delete field ----
+  const handleDeleteField = useCallback(
+    (fieldId: string) => {
+      const field = fields.find((f) => f.id === fieldId);
+      if (!field) return;
+      const refRules = orderRules.filter((r) => r.fieldIds.includes(fieldId));
+      const msg =
+        refRules.length > 0
+          ? `确定删除字段"${field.name}"吗？\n\n${refRules.length} 条业务规则引用了该字段，删除后这些规则将受影响。`
+          : `确定删除字段"${field.name}"吗？`;
+      if (!window.confirm(msg)) return;
+      setFields((prev) => {
+        const next = prev.filter((f) => f.id !== fieldId);
+        if (fieldId === selectedFieldId && next.length > 0) {
+          setSelectedFieldId(next[0].id);
+          setIsEditing(false);
+        }
+        return next;
+      });
+    },
+    [fields, selectedFieldId, orderRules],
+  );
+
   return (
     <div className="space-y-5">
+      {/* ---- Modal for creating new field ---- */}
+      <Modal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="新增字段"
+        subtitle={`为当前业务对象添加一个新字段，支持 22 种字段类型`}
+        width="xl"
+      >
+        <FieldForm
+          mode="create"
+          existingFields={fields}
+          businessObjects={businessObjects}
+          onSave={handleCreateField}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      </Modal>
+
       <div className="grid grid-cols-[1fr_360px] gap-5">
+        {/* ---- Left: Table ---- */}
         <Panel>
           <PanelTitle
             title="字段模型"
             subtitle="字段不仅定义类型，也定义业务语义、风险等级、视图使用范围和 Agent 操作边界。"
-            action={<ActionButton icon={Plus} variant="secondary">新增字段</ActionButton>}
+            action={
+              <ActionButton icon={Plus} variant="secondary" onClick={() => setIsModalOpen(true)}>
+                新增字段
+              </ActionButton>
+            }
           />
           <div className="overflow-hidden">
             <table className="w-full border-collapse text-left text-sm">
@@ -356,54 +474,187 @@ function FieldModelContent() {
                 </tr>
               </thead>
               <tbody>
-                {orderFields.map((field) => (
-                  <tr
-                    key={field.id}
-                    onClick={() => setSelectedFieldId(field.id)}
-                    className={`cursor-pointer ${field.id === selectedField.id ? 'bg-blue-50/80 ring-1 ring-inset ring-blue-200' : 'hover:bg-slate-50'}`}
-                  >
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.name}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.code}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.type}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.semantic}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">
-                      <Badge tone={field.risk === '高' ? 'red' : field.risk === '中' ? 'amber' : 'green'}>{field.risk}</Badge>
-                    </td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.agentPermission}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.views}</td>
-                    <td className="border-b border-slate-100 px-4 py-3 text-slate-700">
-                      {orderRules.filter((rule) => rule.fieldIds.includes(field.id)).length}
+                {fields.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-8 text-center text-sm text-slate-400">
+                      暂无字段，点击「新增字段」添加。
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  fields.map((field) => (
+                    <tr
+                      key={field.id}
+                      onClick={() => handleSelectField(field.id)}
+                      className={`cursor-pointer ${field.id === selectedField.id ? 'bg-blue-50/80 ring-1 ring-inset ring-blue-200' : 'hover:bg-slate-50'}`}
+                    >
+                      <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{field.name}</td>
+                      <td className="border-b border-slate-100 px-4 py-3 font-mono text-xs text-slate-500">{field.code}</td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-slate-700">
+                        <Badge>{field.type}</Badge>
+                      </td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-xs text-slate-600">{field.semantic}</td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-slate-700">
+                        <Badge tone={field.risk === '高' ? 'red' : field.risk === '中' ? 'amber' : 'green'}>{field.risk}</Badge>
+                      </td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-xs text-slate-600">{field.agentPermission}</td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-xs text-slate-500">{field.views}</td>
+                      <td className="border-b border-slate-100 px-4 py-3 text-xs text-slate-600">
+                        {orderRules.filter((rule) => rule.fieldIds.includes(field.id)).length}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </Panel>
 
+        {/* ---- Right: Detail Panel ---- */}
         <Panel>
-          <PanelTitle title={`${selectedField.name} ${selectedField.code}`} subtitle="当前选中字段的语义与影响范围" />
-          <div className="space-y-4 p-5">
-            {[
-              ['基础属性', [`类型：${selectedField.type}`, `编码：${selectedField.code}`, `使用：${selectedField.views}`]],
-              ['业务语义', [selectedField.semantic]],
-              ['风险与约束', [`风险等级：${selectedField.risk}`, `关联规则：${selectedRules.length}`]],
-              ['Agent边界', [`权限：${selectedField.agentPermission}`, selectedField.agentPermission.includes('不可') ? '需人工确认' : '允许参与建议']],
-              ['影响链路', selectedImpacts],
-            ].map(([title, items]) => (
-              <div key={title as string} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <p className="text-xs font-semibold text-slate-500">{title as string}</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {(items as string[]).map((item) => (
-                    <Badge key={item}>{item}</Badge>
+          <PanelTitle
+            title={`${selectedField.name} ${selectedField.code}`}
+            subtitle={isEditing ? '编辑字段属性' : `类型：${selectedField.type}`}
+            action={
+              isEditing ? (
+                <div className="flex gap-2">
+                  <ActionButton variant="secondary" onClick={cancelEditing}>
+                    取消
+                  </ActionButton>
+                  <ActionButton variant="primary" onClick={saveInlineEdit}>
+                    保存
+                  </ActionButton>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <ActionButton icon={Pencil} variant="secondary" onClick={startEditing}>
+                    编辑
+                  </ActionButton>
+                  {fields.length > 1 ? (
+                    <button
+                      onClick={() => handleDeleteField(selectedField.id)}
+                      className="inline-flex h-9 items-center rounded-md border border-red-200 bg-white px-3 text-sm font-medium text-red-600 hover:bg-red-50"
+                    >
+                      删除
+                    </button>
+                  ) : null}
+                </div>
+              )
+            }
+          />
+
+          {isEditing ? (
+            /* ---- Inline Edit Form ---- */
+            <div className="space-y-4 p-5">
+              <TextInput
+                label="字段名"
+                value={editForm.name}
+                onChange={(v) => setEditForm((prev) => ({ ...prev, name: v }))}
+                placeholder="字段名"
+                required
+              />
+              <TextInput
+                label="编码"
+                value={editForm.code}
+                onChange={(v) => setEditForm((prev) => ({ ...prev, code: v }))}
+                placeholder="编码"
+                required
+              />
+              <TextAreaInput
+                label="业务语义"
+                value={editForm.semantic}
+                onChange={(v) => setEditForm((prev) => ({ ...prev, semantic: v }))}
+                placeholder="描述字段的业务含义"
+                rows={2}
+              />
+              <div>
+                <label className="mb-2 block text-xs font-medium text-slate-700">风险等级</label>
+                <div className="flex gap-2">
+                  {['低', '中', '高'].map((level) => (
+                    <label
+                      key={level}
+                      className={`cursor-pointer rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                        editForm.risk === level
+                          ? 'border-slate-950 bg-slate-950 text-white'
+                          : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="risk-edit"
+                        value={level}
+                        checked={editForm.risk === level}
+                        onChange={(e) => setEditForm((prev) => ({ ...prev, risk: e.target.value as '低' | '中' | '高' }))}
+                        className="sr-only"
+                      />
+                      {level}
+                    </label>
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
+              <SelectInput
+                label="Agent 权限"
+                value={editForm.agentPermission}
+                onChange={(v) => setEditForm((prev) => ({ ...prev, agentPermission: v }))}
+                options={[
+                  { label: '只读', value: '只读' },
+                  { label: '可读', value: '可读' },
+                  { label: '可建议', value: '可建议' },
+                  { label: '不可改', value: '不可改' },
+                  { label: '系统控制', value: '系统控制' },
+                ]}
+              />
+              <TextInput
+                label="使用视图"
+                value={editForm.views}
+                onChange={(v) => setEditForm((prev) => ({ ...prev, views: v }))}
+                placeholder="如：3个视图"
+              />
+              <p className="text-xs text-slate-400">
+                类型和校验规则的详细配置请通过「新增字段」弹窗完成。
+              </p>
+            </div>
+          ) : (
+            /* ---- Read-only Detail ---- */
+            <div className="space-y-4 p-5">
+              {[
+                ['基础属性', [`类型：${selectedField.type}`, `编码：${selectedField.code}`, `使用：${selectedField.views}`]],
+                ['业务语义', [selectedField.semantic]],
+                ['风险与约束', [`风险等级：${selectedField.risk}`, `关联规则：${selectedRules.length}`, `校验规则：${selectedField.validationRules?.length ?? 0}`]],
+                ['Agent边界', [`权限：${selectedField.agentPermission}`, selectedField.agentPermission.includes('不可') ? '需人工确认' : '允许参与建议']],
+                ['影响链路', selectedImpacts],
+              ].map(([title, items]) => (
+                <div key={title as string} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-500">{title as string}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {(items as string[]).map((item) => (
+                      <Badge key={item}>{item}</Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {/* Show validation rules if any */}
+              {selectedField.validationRules && selectedField.validationRules.length > 0 ? (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-500">校验规则</p>
+                  <div className="mt-2 space-y-1">
+                    {selectedField.validationRules.map((vr) => (
+                      <div key={vr.id} className="text-xs text-slate-600">
+                        <Badge tone="amber">{vr.type}</Badge>
+                        <span className="ml-2">{vr.message}</span>
+                        {vr.value != null ? (
+                          <span className="ml-1 text-slate-400">({vr.value})</span>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          )}
         </Panel>
       </div>
 
+      {/* ---- Bottom: Rules referencing selected field ---- */}
       <Panel>
         <PanelTitle
           title="被该字段影响的规则"

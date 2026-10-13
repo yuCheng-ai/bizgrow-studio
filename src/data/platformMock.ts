@@ -1,4 +1,5 @@
 import { MarkerType, Position, type Edge, type Node } from '@xyflow/react';
+import type { FieldValidationRule } from './fieldTypes';
 
 export type ObjectStatus = '运行中' | '需治理';
 
@@ -21,11 +22,21 @@ export interface ObjectFieldMock {
   name: string;
   code: string;
   type: string;
+  /** 新版类型系统 code，映射自 fieldTypes.ts */
+  fieldTypeCode: string;
   semantic: string;
   risk: '低' | '中' | '高';
   agentPermission: string;
   views: string;
   ruleHits: string;
+  /** 字段描述 */
+  description?: string;
+  /** 默认值 */
+  defaultValue?: string;
+  /** 字段级校验规则 */
+  validationRules: FieldValidationRule[];
+  /** 类型专属配置（由 fieldTypes.ts configurableProperties 定义的表单值） */
+  typeProperties: Record<string, unknown>;
 }
 
 export interface ObjectMetricMock {
@@ -111,15 +122,109 @@ export const orderMetrics: ObjectMetricMock[] = [
 ];
 
 export const orderFields: ObjectFieldMock[] = [
-  { id: 'orderNo', name: '订单编号', code: 'orderNo', type: '文本', semantic: '交易唯一标识', risk: '低', agentPermission: '只读', views: '3个视图', ruleHits: '0' },
-  { id: 'customer', name: '客户', code: 'customer', type: '引用对象', semantic: '交付对象与账期主体', risk: '中', agentPermission: '可读', views: '5个视图', ruleHits: '2' },
-  { id: 'product', name: '产品', code: 'product', type: '引用对象', semantic: '交付物与BOM入口', risk: '中', agentPermission: '可读', views: '4个视图', ruleHits: '5' },
-  { id: 'qty', name: '数量', code: 'qty', type: '数字', semantic: '物料需求倍数', risk: '中', agentPermission: '可建议', views: '4个视图', ruleHits: '3' },
-  { id: 'deliveryDate', name: '承诺交期', code: 'deliveryDate', type: '日期', semantic: '客户交付承诺日期', risk: '高', agentPermission: '不可改', views: '6个视图', ruleHits: '7' },
-  { id: 'amount', name: '订单金额', code: 'amount', type: '金额', semantic: '收入与审批风险字段', risk: '高', agentPermission: '不可改', views: '5个视图', ruleHits: '6' },
-  { id: 'specialRequirement', name: '特殊要求', code: 'specialRequirement', type: '长文本', semantic: '非标约束入口', risk: '高', agentPermission: '可建议', views: '4个视图', ruleHits: '4' },
-  { id: 'status', name: '订单状态', code: 'status', type: '状态', semantic: '对象生命周期主字段', risk: '中', agentPermission: '系统控制', views: '6个视图', ruleHits: '8' },
+  { id: 'orderNo', name: '订单编号', code: 'orderNo', type: '文本', fieldTypeCode: 'text', semantic: '交易唯一标识', risk: '低', agentPermission: '只读', views: '3个视图', ruleHits: '0', validationRules: [{ id: 'vr_1', type: 'required', message: '订单编号不能为空' }, { id: 'vr_2', type: 'unique', message: '订单编号必须唯一' }], typeProperties: { maxLength: 32, unique: true } },
+  { id: 'customer', name: '客户', code: 'customer', type: '引用对象', fieldTypeCode: 'reference', semantic: '交付对象与账期主体', risk: '中', agentPermission: '可读', views: '5个视图', ruleHits: '2', validationRules: [{ id: 'vr_3', type: 'required', message: '客户不能为空' }], typeProperties: { targetObject: 'customer', displayField: 'name', required: true } },
+  { id: 'product', name: '产品', code: 'product', type: '引用对象', fieldTypeCode: 'reference', semantic: '交付物与BOM入口', risk: '中', agentPermission: '可读', views: '4个视图', ruleHits: '5', validationRules: [{ id: 'vr_4', type: 'required', message: '产品不能为空' }], typeProperties: { targetObject: 'product', displayField: 'name', required: true } },
+  { id: 'qty', name: '数量', code: 'qty', type: '数字', fieldTypeCode: 'number', semantic: '物料需求倍数', risk: '中', agentPermission: '可建议', views: '4个视图', ruleHits: '3', validationRules: [{ id: 'vr_5', type: 'required', message: '数量不能为空' }, { id: 'vr_6', type: 'min', value: 1, message: '数量必须大于0' }], typeProperties: { min: 1, decimalPlaces: 0, unit: '件' } },
+  { id: 'deliveryDate', name: '承诺交期', code: 'deliveryDate', type: '日期', fieldTypeCode: 'date', semantic: '客户交付承诺日期', risk: '高', agentPermission: '不可改', views: '6个视图', ruleHits: '7', validationRules: [{ id: 'vr_7', type: 'required', message: '承诺交期不能为空' }], typeProperties: { includeTime: false } },
+  { id: 'amount', name: '订单金额', code: 'amount', type: '金额', fieldTypeCode: 'amount', semantic: '收入与审批风险字段', risk: '高', agentPermission: '不可改', views: '5个视图', ruleHits: '6', validationRules: [{ id: 'vr_8', type: 'required', message: '金额不能为空' }, { id: 'vr_9', type: 'min', value: 0, message: '金额不能为负' }], typeProperties: { currency: 'CNY', min: 0 } },
+  { id: 'specialRequirement', name: '特殊要求', code: 'specialRequirement', type: '长文本', fieldTypeCode: 'longText', semantic: '非标约束入口', risk: '高', agentPermission: '可建议', views: '4个视图', ruleHits: '4', validationRules: [], typeProperties: { maxLength: 2000, richText: false } },
+  { id: 'status', name: '订单状态', code: 'status', type: '状态', fieldTypeCode: 'status', semantic: '对象生命周期主字段', risk: '中', agentPermission: '系统控制', views: '6个视图', ruleHits: '8', validationRules: [], typeProperties: { linkedLifecycle: 'order_lifecycle', initialState: '草稿' } },
 ];
+
+// ===== 各业务对象的字段清单（用于引用字段选择"目标对象"后的"展示字段"下拉） =====
+export interface ObjectFieldMeta {
+  name: string;
+  code: string;
+  type: string;
+}
+
+export const OBJECT_FIELDS_MAP: Record<string, ObjectFieldMeta[]> = {
+  // 订单
+  order: [
+    { name: '订单编号', code: 'orderNo', type: 'text' },
+    { name: '客户', code: 'customer', type: 'reference' },
+    { name: '产品', code: 'product', type: 'reference' },
+    { name: '数量', code: 'qty', type: 'number' },
+    { name: '承诺交期', code: 'deliveryDate', type: 'date' },
+    { name: '订单金额', code: 'amount', type: 'amount' },
+    { name: '特殊要求', code: 'specialRequirement', type: 'longText' },
+    { name: '订单状态', code: 'status', type: 'status' },
+  ],
+  // 客户
+  customer: [
+    { name: '客户名称', code: 'name', type: 'text' },
+    { name: '客户编码', code: 'code', type: 'text' },
+    { name: '信用等级', code: 'creditLevel', type: 'enum' },
+    { name: '联系人', code: 'contact', type: 'text' },
+    { name: '电话', code: 'phone', type: 'phone' },
+    { name: '邮箱', code: 'email', type: 'email' },
+    { name: '账期(天)', code: 'paymentDays', type: 'number' },
+    { name: '地址', code: 'address', type: 'longText' },
+  ],
+  // 产品
+  product: [
+    { name: '产品名称', code: 'name', type: 'text' },
+    { name: '产品编码', code: 'code', type: 'text' },
+    { name: '产品类别', code: 'category', type: 'enum' },
+    { name: '规格', code: 'spec', type: 'text' },
+    { name: '单位', code: 'unit', type: 'enum' },
+    { name: '标准价格', code: 'standardPrice', type: 'amount' },
+    { name: '关联BOM', code: 'bomId', type: 'reference' },
+  ],
+  // BOM
+  bom: [
+    { name: 'BOM编号', code: 'bomNo', type: 'text' },
+    { name: 'BOM名称', code: 'name', type: 'text' },
+    { name: '关联产品', code: 'productId', type: 'reference' },
+    { name: '版本号', code: 'version', type: 'text' },
+    { name: '状态', code: 'status', type: 'status' },
+  ],
+  // 物料
+  material: [
+    { name: '物料名称', code: 'name', type: 'text' },
+    { name: '物料编码', code: 'code', type: 'text' },
+    { name: '规格', code: 'spec', type: 'text' },
+    { name: '单位', code: 'unit', type: 'enum' },
+    { name: '安全库存', code: 'safetyStock', type: 'number' },
+    { name: '采购提前期(天)', code: 'leadTime', type: 'number' },
+  ],
+  // 库存
+  inventory: [
+    { name: '库位', code: 'location', type: 'text' },
+    { name: '关联物料', code: 'materialId', type: 'reference' },
+    { name: '可用量', code: 'availableQty', type: 'number' },
+    { name: '冻结量', code: 'frozenQty', type: 'number' },
+    { name: '占用量', code: 'reservedQty', type: 'number' },
+  ],
+  // 采购需求
+  purchase_request: [
+    { name: '需求编号', code: 'prNo', type: 'text' },
+    { name: '关联物料', code: 'materialId', type: 'reference' },
+    { name: '需求数量', code: 'qty', type: 'number' },
+    { name: '需求日期', code: 'requiredDate', type: 'date' },
+    { name: '状态', code: 'status', type: 'status' },
+    { name: '来源订单', code: 'sourceOrderId', type: 'reference' },
+  ],
+  // 生产任务
+  work_order: [
+    { name: '工单号', code: 'woNo', type: 'text' },
+    { name: '关联订单', code: 'orderId', type: 'reference' },
+    { name: '关联产品', code: 'productId', type: 'reference' },
+    { name: '计划数量', code: 'plannedQty', type: 'number' },
+    { name: '开工日期', code: 'startDate', type: 'date' },
+    { name: '完工日期', code: 'endDate', type: 'date' },
+    { name: '状态', code: 'status', type: 'status' },
+  ],
+  // 发货单
+  delivery_note: [
+    { name: '发货单号', code: 'dnNo', type: 'text' },
+    { name: '关联订单', code: 'orderId', type: 'reference' },
+    { name: '承运商', code: 'carrier', type: 'text' },
+    { name: '发货日期', code: 'shipDate', type: 'date' },
+    { name: '签收状态', code: 'signStatus', type: 'enum' },
+  ],
+};
 
 export const orderRules: ObjectRuleMock[] = [
   {
